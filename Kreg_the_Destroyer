@@ -1,0 +1,91 @@
+# Kreg the Destroyer
+
+
+
+# rooms and items in said rooms
+rooms = {
+    'Broken Wall': {'East': 'Musty Hallway'},   # Start Room
+    'Musty Hallway':  {'North': 'Flooded Passageway', 'East': 'Bone Storage',
+                       'South': 'Barracks', 'West': 'Broken Wall', 'Item': 'Torch'},
+    'Flooded Passageway': {'East': 'Armory', 'South': 'Musty Hallway', 'Item': 'Ring'},
+    'Armory': {'West': 'Flooded Passageway', 'Item': 'Sword'},
+    'Barracks': {'North': 'Musty Hallway', 'East': 'Collapsed Tunnel', 'Item': 'Shield'},
+    'Collapsed Tunnel': {'West': 'Barracks', 'Item': 'Chestplate'},
+    'Bone Storage': {'North': 'Treasury', 'West': 'Musty Hallway', 'Item': 'Key'},
+    'Treasury': {'South': 'Bone Storage', 'Item': 'Kreg!'}   # Villain Room
+}
+
+# Instruction Function
+def show_instructions():
+
+    print('Welcome to Kreg the Destroyer!!!')
+    print('You must find all 6 items to defeat Kreg.')
+    print('If you find Kreg before having all the items, HE WILL EAT YOU!')
+    print('Commands: To move type "go North, go East, go South, go West"')
+    print('To grab and item type, "get [item name]"')
+
+# Move function to iterate through the nested dictionary
+def move_room(direction):
+    for ro, di in rooms.items():
+        for d in di:
+            if current_room == ro:
+                if direction == d:
+                    direction = di[d]
+                    return direction
+
+# Checks to see if the item is in room
+def get_item(item):
+    if 'Item' in rooms[current_room]:
+        if item in rooms[current_room]['Item']:
+            return item
+
+#Status function to update where you are, what you have, and what you see
+def status():
+    print('Your current room is a', current_room)
+    print('Inventory:', inventory)
+    if 'Item' in rooms[current_room]:
+        if rooms[current_room]['Item'] in inventory:
+            print(end='')
+        else: print('You see a', rooms[current_room]['Item'])
+
+# commands
+go_commands = ['go north', 'go east', 'go south', 'go west']
+
+inventory = []
+current_room = 'Broken Wall'
+show_instructions()
+# First while loop is so a blank 'enter' doesn't close the game
+want_continue = True
+while want_continue is True:
+    # Loop for win/lose conditions
+    while current_room != 'Treasury' and len(inventory) <= 6:
+        status()
+        move = input('What\'s your move?').strip().lower()
+        split_move = move.split()
+        if move != '':
+
+            if len(inventory) == 6:
+                break
+            elif move in go_commands:
+                room = move_room(split_move[1].capitalize())
+                if room is None:
+                    print('Can\'t go that way.')
+                else:
+                    current_room = room
+            elif split_move[0] == 'get':
+                item = get_item(split_move[1].title())
+                if item is None:
+                    print('That is not an item.')
+                else:
+                    inventory.append(item)
+            elif move == 'exit':
+                print('Aww gone so soon? \n GoodBye! :)')
+                break
+    want_continue = False
+
+# Different outputs depending on win, lose, or exit
+if current_room == 'Treasury': print('You wern\'t ready for Kreg!! \n !!!GAME OVER!!!')
+
+elif len(inventory) == 6: print('You have all the items to defeat Kreg!!! \n YOU WIN!!!')
+
+leave = input('To exit, press any key')
